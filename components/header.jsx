@@ -21,7 +21,7 @@ const Header = () => {
             {/*add logo*/}
         </Link>
       
-      
+      <div className="flex items-center ml-auto gap-4">
         <SignedOut>
           <SignInButton forceRedirectUrl='/dashboard'/>
           <SignUpButton>
@@ -33,6 +33,7 @@ const Header = () => {
         <SignedIn>
           <UserButton />
         </SignedIn>
+      </div>
     
       </nav>
       </div>
