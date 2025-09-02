@@ -3,7 +3,10 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-   <Button variant="destructive">hiiiii</Button>
-         
+    <div className="flex items-center pt-40">
+      <Button variant="destructive">hiiiii</Button>
+    </div>
+
+
   );
 }
