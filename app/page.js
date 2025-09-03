@@ -1,10 +1,11 @@
-import { Button } from "@/components/ui/button";
+
+import HeroSection from "@/components/hero";
 import Image from "next/image";
 
 export default function Home() {
   return (
     <div className="flex items-center pt-40">
-      <Button variant="destructive">hiiiii</Button>
+      <HeroSection/>
     </div>
 
 
