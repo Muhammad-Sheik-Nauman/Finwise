@@ -7,38 +7,38 @@ import { useEffect, useRef } from "react";
 
 const HeroSection = () => {
 
- const imageRef = useRef();
+  const imageRef = useRef();
 
-    useEffect(() => {
-      const imageElement = imageRef.current;
-      const handleScroll=()=>{
-        const scrollPosition = window.scrollY;
-        const scrollThreshold = 100;
+  useEffect(() => {
+    const imageElement = imageRef.current;
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const scrollThreshold = 100;
 
-        if(scrollPosition>scrollThreshold){
-          imageElement.classList.add("scrolled")
-        }else{
-          imageElement.classList.remove("scrolled")
-        }
+      if (scrollPosition > scrollThreshold) {
+        imageElement.classList.add("scrolled")
+      } else {
+        imageElement.classList.remove("scrolled")
       }
-      
+    }
 
 
 
-      window.addEventListener("scroll",handleScroll)
-      return()=>{
-window.removeEventListener("scroll",handleScroll)
-      } ;
+
+    window.addEventListener("scroll", handleScroll)
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    };
 
 
 
-    }, []);
+  }, []);
 
 
   return (
 
 
-   
+
 
     <div className="pb-20 px-4 mx-10">
       <div className="container mx-auto text-center">
