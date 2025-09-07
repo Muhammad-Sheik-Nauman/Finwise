@@ -15,12 +15,13 @@ import { LayoutDashboard, PenBox } from 'lucide-react'
 
 
 
+
 const Header = () => {
   return (
     <div className='fixed top- w-full bg-white/80 backdrop-blur-md z-50 border-b'>
       <nav className='container mx-auto px-4 py-1 flex items-center justify-between'>
-        <Link href="/">
-          {/*add logo*/}
+        <Link className='h-12 w-16 flex items-center' href="/">
+          <Image src="/logo.jpeg" alt="Logo" width={100} height={48} className="object-contain h-12 w-16" />
         </Link>
 
         <div className="flex items-center ml-auto gap-4">
