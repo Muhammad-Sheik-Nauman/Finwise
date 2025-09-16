@@ -1,12 +1,17 @@
 import React from 'react'
+import CreateAccountDrawer from '@/components/create-account-drawer';
 
  function DashboardPage(){
   return (
     <div className='px-5'>
-        
-             <div className='px-5'>Page</div>
-        
-        
+        {/* budget progress */}
+        {/* Dashboard Overview */}
+        {/* accounts grid */} 
+          <div>
+            <CreateAccountDrawer>
+                open
+            </CreateAccountDrawer>
+          </div>
     </div>
   )
 };
