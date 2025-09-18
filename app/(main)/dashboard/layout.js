@@ -14,7 +14,7 @@ const DashboardLayout = () => {
                 <DashboardPage />
             </Suspense>
 
-
+        
         </div>
     )
 }
