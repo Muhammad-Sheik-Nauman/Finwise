@@ -8,7 +8,7 @@ import { ArrowDownRight } from 'lucide-react';
 import Link from 'next/link';
 import useFetch from '@/hooks/use-fetch';
 import { useEffect } from 'react';
-import { updateDefaultAccount } from '@/actions/accounts';
+import { updateDefaultAccount } from '@/actions/account';
 import { toast } from 'sonner';
 
 const AccountCard = ({ account }) => {
