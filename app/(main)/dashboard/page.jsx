@@ -21,7 +21,7 @@ import BudgetProgress from './_components/budget-progress';
 
 
   return (
-    <div className='px-5'>
+    <div className='space-y-8'>
         {/* budget progress */}
         {defaultAccount && ( <BudgetProgress 
         initialBudget={budgetData?.budget}
