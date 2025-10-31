@@ -17,6 +17,7 @@ import { Switch } from "@/components/ui/switch";
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import ReciptScanner from './recipt-scanner';
 
 
 import {
@@ -82,9 +83,24 @@ const onSubmit = async(data)=>{
     (category) => category.type === type
   );
 
+   const handleScanComplete = (scannedData) => {
+    if (scannedData) {
+      setValue("amount", scannedData.amount.toString());
+      setValue("date", new Date(scannedData.date));
+      if (scannedData.description) {
+        setValue("description", scannedData.description);
+      }
+      if (scannedData.category) {
+        setValue("category", scannedData.category);
+      }
+      toast.success("Receipt scanned successfully");
+    }
+  };
+
   return (
     <form className='space-y-6 mb-20' onSubmit={handleSubmit(onSubmit)}>
       {/* ai receipt scanner */}
+      <ReciptScanner onScanComplete={handleScanComplete}/>
 
       <div className='space-y-2' >
         <label className='text-sm font-medium'>Type</label>
