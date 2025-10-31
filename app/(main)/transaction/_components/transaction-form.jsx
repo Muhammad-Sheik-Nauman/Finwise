@@ -1,25 +1,17 @@
 "use client";
 
-import React from 'react'
-import { transactionSchema } from '@/app/lib/schema';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import useFetch from "@/hooks/use-fetch";
-import { createTransaction } from "@/actions/transaction";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import CreateAccountDrawer from "@/components/create-account-drawer";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { useRouter, useSearchParams } from "next/navigation";
+import useFetch from "@/hooks/use-fetch";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { toast } from 'sonner';
-import ReciptScanner from './recipt-scanner';
-
-
 import {
   Select,
   SelectContent,
@@ -27,8 +19,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-const AddTransactionForm = ({ accounts, categories }) => {
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CreateAccountDrawer } from "@/components/create-account-drawer";
+import { cn } from "@/lib/utils";
+import { createTransaction, updateTransaction } from "@/actions/transaction";
+import { transactionSchema } from "@/app/lib/schema";
+import { ReceiptScanner } from "./recipt-scanner";
+
+export function AddTransactionForm({
+  accounts,
+  categories,
+  editMode = false,
+  initialData = null,
+}) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("edit");
+
   const {
     register,
     handleSubmit,
@@ -39,51 +51,50 @@ const AddTransactionForm = ({ accounts, categories }) => {
     reset,
   } = useForm({
     resolver: zodResolver(transactionSchema),
-    defaultValues: {
-      type: "EXPENSE",
-      amount: "",
-      description: "",
-      accountId: accounts.find((ac) => ac.isDefault)?.id,
-      date: new Date(),
-      isRecurring: false,
-    }
+    defaultValues:
+      editMode && initialData
+        ? {
+            type: initialData.type,
+            amount: initialData.amount.toString(),
+            description: initialData.description,
+            accountId: initialData.accountId,
+            category: initialData.category,
+            date: new Date(initialData.date),
+            isRecurring: initialData.isRecurring,
+            ...(initialData.recurringInterval && {
+              recurringInterval: initialData.recurringInterval,
+            }),
+          }
+        : {
+            type: "EXPENSE",
+            amount: "",
+            description: "",
+            accountId: accounts.find((ac) => ac.isDefault)?.id,
+            date: new Date(),
+            isRecurring: false,
+          },
   });
 
   const {
     loading: transactionLoading,
     fn: transactionFn,
     data: transactionResult,
-  } = useFetch(createTransaction);
+  } = useFetch(editMode ? updateTransaction : createTransaction);
 
-  const type = watch("type");
-  const isRecurring = watch("isRecurring");
-  const date = watch("date");
+  const onSubmit = (data) => {
+    const formData = {
+      ...data,
+      amount: parseFloat(data.amount),
+    };
 
-const onSubmit = async(data)=>{
-  const formData = {
-    ...data,
-    amount:parseFloat(data.amount)
-  }
-  transactionFn(formData)
-}
-
- useEffect(() => {
-    if (transactionResult?.success && !transactionLoading) {
-      toast.success(
-        
-          "Transaction created successfully"
-      );
-      reset();
-      router.push(`/account/${transactionResult.data.accountId}`);
+    if (editMode) {
+      transactionFn(editId, formData);
+    } else {
+      transactionFn(formData);
     }
-  }, [transactionResult, transactionLoading]);
+  };
 
-
-  const filteredCategories = categories.filter(
-    (category) => category.type === type
-  );
-
-   const handleScanComplete = (scannedData) => {
+  const handleScanComplete = (scannedData) => {
     if (scannedData) {
       setValue("amount", scannedData.amount.toString());
       setValue("date", new Date(scannedData.date));
@@ -97,55 +108,74 @@ const onSubmit = async(data)=>{
     }
   };
 
-  return (
-    <form className='space-y-6 mb-20' onSubmit={handleSubmit(onSubmit)}>
-      {/* ai receipt scanner */}
-      <ReciptScanner onScanComplete={handleScanComplete}/>
+  useEffect(() => {
+    if (transactionResult?.success && !transactionLoading) {
+      toast.success(
+        editMode
+          ? "Transaction updated successfully"
+          : "Transaction created successfully"
+      );
+      reset();
+      router.push(`/account/${transactionResult.data.accountId}`);
+    }
+  }, [transactionResult, transactionLoading, editMode]);
 
-      <div className='space-y-2' >
-        <label className='text-sm font-medium'>Type</label>
+  const type = watch("type");
+  const isRecurring = watch("isRecurring");
+  const date = watch("date");
+
+  const filteredCategories = categories.filter(
+    (category) => category.type === type
+  );
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Receipt Scanner - Only show in create mode */}
+      {!editMode && <ReceiptScanner onScanComplete={handleScanComplete} />}
+
+      {/* Type */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Type</label>
         <Select
           onValueChange={(value) => setValue("type", value)}
           defaultValue={type}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select Type" />
+            <SelectValue placeholder="Select type" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="EXPENSE">Expense</SelectItem>
             <SelectItem value="INCOME">Income</SelectItem>
-
           </SelectContent>
         </Select>
-
         {errors.type && (
           <p className="text-sm text-red-500">{errors.type.message}</p>
         )}
       </div>
 
-      <div className='grid gap-6 md:grid-cols-2' >
-        <div className='space-y-2' >
-          <label className='text-sm font-medium'>Amount</label>
+      {/* Amount and Account */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Amount</label>
           <Input
             type="number"
             step="0.01"
             placeholder="0.00"
             {...register("amount")}
           />
-
-
           {errors.amount && (
             <p className="text-sm text-red-500">{errors.amount.message}</p>
           )}
         </div>
-        <div className='space-y-2' >
-          <label className='text-sm font-medium'>Account</label>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Account</label>
           <Select
             onValueChange={(value) => setValue("accountId", value)}
             defaultValue={getValues("accountId")}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select Account" />
+              <SelectValue placeholder="Select account" />
             </SelectTrigger>
             <SelectContent>
               {accounts.map((account) => (
@@ -153,7 +183,6 @@ const onSubmit = async(data)=>{
                   {account.name} (${parseFloat(account.balance).toFixed(2)})
                 </SelectItem>
               ))}
-
               <CreateAccountDrawer>
                 <Button
                   variant="ghost"
@@ -162,17 +191,15 @@ const onSubmit = async(data)=>{
                   Create Account
                 </Button>
               </CreateAccountDrawer>
-
-
             </SelectContent>
           </Select>
-
-          {errors.type && (
-            <p className="text-sm text-red-500">{errors.type.message}</p>
+          {errors.accountId && (
+            <p className="text-sm text-red-500">{errors.accountId.message}</p>
           )}
         </div>
       </div>
 
+      {/* Category */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Category</label>
         <Select
@@ -195,17 +222,17 @@ const onSubmit = async(data)=>{
         )}
       </div>
 
- 
+      {/* Date */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Date</label>
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className=
-                "w-full pl-3 text-left font-normal"
-                
-              
+              className={cn(
+                "w-full pl-3 text-left font-normal",
+                !date && "text-muted-foreground"
+              )}
             >
               {date ? format(date, "PPP") : <span>Pick a date</span>}
               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
@@ -228,6 +255,7 @@ const onSubmit = async(data)=>{
         )}
       </div>
 
+      {/* Description */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Description</label>
         <Input placeholder="Enter description" {...register("description")} />
@@ -236,7 +264,8 @@ const onSubmit = async(data)=>{
         )}
       </div>
 
-       <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+      {/* Recurring Toggle */}
+      <div className="flex flex-row items-center justify-between rounded-lg border p-4">
         <div className="space-y-0.5">
           <label className="text-base font-medium">Recurring Transaction</label>
           <div className="text-sm text-muted-foreground">
@@ -249,8 +278,8 @@ const onSubmit = async(data)=>{
         />
       </div>
 
-
-         {isRecurring && (
+      {/* Recurring Interval */}
+      {isRecurring && (
         <div className="space-y-2">
           <label className="text-sm font-medium">Recurring Interval</label>
           <Select
@@ -275,6 +304,7 @@ const onSubmit = async(data)=>{
         </div>
       )}
 
+      {/* Actions */}
       <div className="flex gap-4">
         <Button
           type="button"
@@ -285,16 +315,18 @@ const onSubmit = async(data)=>{
           Cancel
         </Button>
         <Button type="submit" className="w-full" disabled={transactionLoading}>
-          Create Transaction
+          {transactionLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {editMode ? "Updating..." : "Creating..."}
+            </>
+          ) : editMode ? (
+            "Update Transaction"
+          ) : (
+            "Create Transaction"
+          )}
         </Button>
       </div>
-
-
-
-
-
     </form>
-  )
+  );
 }
-
-export default AddTransactionForm
