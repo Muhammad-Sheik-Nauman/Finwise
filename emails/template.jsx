@@ -68,16 +68,16 @@ export default function EmailTemplate({
             <Section style={styles.statsContainer}>
               <div style={styles.stat}>
                 <Text style={styles.text}>Total Income</Text>
-                <Text style={styles.heading}>${data?.stats.totalIncome}</Text>
+               <Text style={styles.heading}>${(data?.stats?.totalIncome ?? 0)}</Text>
               </div>
               <div style={styles.stat}>
                 <Text style={styles.text}>Total Expenses</Text>
-                <Text style={styles.heading}>${data?.stats.totalExpenses}</Text>
+                 <Text style={styles.heading}>${(data?.stats?.totalExpenses ?? 0)}</Text>
               </div>
               <div style={styles.stat}>
                 <Text style={styles.text}>Net</Text>
                 <Text style={styles.heading}>
-                  ${data?.stats.totalIncome - data?.stats.totalExpenses}
+                 ${( (data?.stats?.totalIncome ?? 0) - (data?.stats?.totalExpenses ?? 0) )}
                 </Text>
               </div>
             </Section>
@@ -101,7 +101,7 @@ export default function EmailTemplate({
             {data?.insights && (
               <Section style={styles.section}>
                 <Heading style={styles.heading}>Welth Insights</Heading>
-                {data.insights.map((insight, index) => (
+                {data?.insights?.map((insight, index) => (
                   <Text key={index} style={styles.text}>
                     • {insight}
                   </Text>
@@ -129,7 +129,7 @@ export default function EmailTemplate({
             <Heading style={styles.title}>Budget Alert</Heading>
             <Text style={styles.text}>Hello {userName},</Text>
             <Text style={styles.text}>
-              You&rsquo;ve used {data?.percentageUsed.toFixed(1)}% of your
+              You&rsquo;ve used {(data?.percentageUsed ?? 0).toFixed(1)}% of your
               monthly budget.
             </Text>
             <Section style={styles.statsContainer}>
