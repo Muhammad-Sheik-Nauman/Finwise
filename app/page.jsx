@@ -11,12 +11,12 @@ export default function Home() {
   return (
     <div className=" items-center pt-40">
       <HeroSection />
-      <section className="py-20 bg-blue-50">
+      <section className="py-20 bg-green-50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {statsData.map((statsData, index) => (
               <div key={index} className="text-center">
-                <div className="text-4xl font-bold text-blue-600 mb-2">{statsData.value}</div>
+                <div className="text-4xl font-bold text-green-700 mb-2">{statsData.value}</div>
                 <div className="text-gray-600">{statsData.label}</div>
               </div>
             )
@@ -49,14 +49,14 @@ export default function Home() {
 
       </section>
 
-      <section className="py-20 bg-blue-50">
+      <section className="py-20 bg-green-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-16">How it Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {howItWorksData.map((step, index) => (
               <div key={index} className="text-center">
 
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">{step.icon}</div>
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">{step.icon}</div>
                 <h3 className="text-xl font-semibold mb-4">{step.title}</h3>
                 <p className="text-gray-600">{step.description}</p>
               </div>
@@ -99,17 +99,17 @@ export default function Home() {
 
       </section>
 
-<section className="py-20 bg-blue-600">
+<section className="py-20 bg-green-700">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-center mb-4 text-white">Ready to Take Control of Your Finances?</h2>
-          <p className="text-blue-100 mb-8 max-w-screen-2xl mx-auto">
+          <p className="text-green-100 mb-8 max-w-screen-2xl mx-auto">
             Join thousands of users who are already managing their finances
             smarter with Finwise
           </p>
           <Link href="/dashboard">
           <Button
            size="lg"
-           className="bg-white text-blue-600 hover:bg-blue-50 animate-bounce"
+           className="bg-white text-green-700 hover:bg-green-100 animate-bounce"
            >
           Start Free Trial 
 
